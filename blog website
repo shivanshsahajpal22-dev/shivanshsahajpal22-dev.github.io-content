@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shivansh Sahajpal — Writeups</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0c0f;
+      --bg2: #0f1318;
+      --bg3: #141920;
+      --border: #1e2a35;
+      --green: #00ff87;
+      --cyan: #00e5ff;
+      --orange: #ff9f43;
+      --red: #ff4757;
+      --text: #c8d8e8;
+      --text-dim: #5a7080;
+      --text-bright: #e8f4ff;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+    }
+    /* Scanlines */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 48px;
+      background: rgba(10,12,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--green);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--text-dim); font-weight: 400; font-family: var(--mono); font-size: 0.85rem; }
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-right a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-right a:hover { color: var(--green); }
+    .nav-count {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 80px 48px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(rgba(0,255,135,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,135,0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    .hero-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-label::before { content: ''; width: 28px; height: 1px; background: var(--green); }
+    .hero h1 {
+      font-family: var(--sans);
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      color: var(--text-bright);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--green); }
+    .hero-sub {
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      line-height: 1.8;
+      max-width: 560px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .stat { }
+    .stat-num {
+      font-family: var(--sans);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--green);
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 48px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-right: 8px;
+    }
+    .filter-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .search-box {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-bright);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      width: 200px;
+    }
+    .search-box input::placeholder { color: var(--text-dim); }
+    .search-icon { color: var(--text-dim); font-size: 0.85rem; }
+
+    /* ── MAIN GRID ── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 48px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+      align-items: start;
+    }
+
+    /* ── WRITEUP CARDS ── */
+    .writeups-list { display: flex; flex-direction: column; gap: 2px; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      border: 1px dashed var(--border);
+      padding: 80px 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .empty-icon { font-size: 2.5rem; }
+    .empty-title {
+      font-family: var(--sans);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+    .empty-sub { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; max-width: 340px; }
+    .empty-hint {
+      margin-top: 8px;
+      padding: 14px 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      text-align: left;
+      line-height: 1.8;
+    }
+    .empty-hint .hl { color: var(--cyan); }
+
+    /* ══════════════════════════════════════════
+       HOW TO ADD A WRITEUP:
+       Copy the <article class="writeup-card"> block below
+       and paste it above the empty-state div.
+       Fill in the data-* attributes and inner content.
+    ══════════════════════════════════════════ */
+
+    /*
+    WRITEUP CARD TEMPLATE (copy this HTML):
+
+    <article class="writeup-card" data-tags="web bugbounty">
+      <div class="wc-left">
+        <div class="wc-date">DD MMM YYYY</div>
+        <div class="wc-num">01</div>
+      </div>
+      <div class="wc-body">
+        <div class="wc-tags">
+          <span class="wc-tag web">Web</span>
+          <span class="wc-tag bugbounty">Bug Bounty</span>
+        </div>
+        <h2 class="wc-title">Your Writeup Title Here</h2>
+        <p class="wc-excerpt">
+          A short 1-2 sentence summary of what this writeup is about.
+          What vulnerability, what platform, what did you find?
+        </p>
+        <div class="wc-meta">
+          <span class="wc-difficulty medium">Medium</span>
+          <span class="wc-platform">HackerOne</span>
+          <span class="wc-read">5 min read</span>
+        </div>
+        <a href="writeup-01.html" class="wc-link">Read Writeup →</a>
+      </div>
+    </article>
+
+    TAG OPTIONS for wc-tag class: web | cloud | ctf | bugbounty | tool | network
+    DIFFICULTY OPTIONS: easy | medium | hard | critical
+    */
+
+    .writeup-card {
+      display: flex;
+      gap: 0;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.25s, transform 0.2s;
+    }
+    .writeup-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--green);
+      transform: scaleY(0);
+      transition: transform 0.25s;
+    }
+    .writeup-card:hover { border-color: var(--green); }
+    .writeup-card:hover::before { transform: scaleY(1); }
+
+    .wc-left {
+      padding: 24px 20px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      min-width: 80px;
+    }
+    .wc-date {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+    .wc-num {
+      font-family: var(--sans);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--border);
+    }
+
+    .wc-body { padding: 24px 28px; flex: 1; }
+
+    .wc-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .wc-tag {
+      padding: 3px 9px;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+    .wc-tag.web       { border-color: var(--cyan);   color: var(--cyan); }
+    .wc-tag.cloud     { border-color: var(--orange);  color: var(--orange); }
+    .wc-tag.ctf       { border-color: #a29bfe;        color: #a29bfe; }
+    .wc-tag.bugbounty { border-color: var(--green);   color: var(--green); }
+    .wc-tag.tool      { border-color: #fd79a8;        color: #fd79a8; }
+    .wc-tag.network   { border-color: #74b9ff;        color: #74b9ff; }
+
+    .wc-title {
+      font-family: var(--sans);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .wc-excerpt {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .wc-meta {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      flex-wrap: wrap;
+    }
+    .wc-difficulty {
+      padding: 2px 8px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .wc-difficulty.easy     { background: rgba(0,255,135,0.1); color: var(--green); }
+    .wc-difficulty.medium   { background: rgba(255,159,67,0.1); color: var(--orange); }
+    .wc-difficulty.hard     { background: rgba(255,71,87,0.12); color: var(--red); }
+    .wc-difficulty.critical { background: rgba(255,71,87,0.2);  color: var(--red); border: 1px solid var(--red); }
+
+    .wc-link {
+      display: inline-block;
+      font-size: 0.78rem;
+      color: var(--cyan);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--cyan);
+      padding-bottom: 2px;
+      transition: opacity 0.2s;
+    }
+    .wc-link:hover { opacity: 0.7; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { display: flex; flex-direction: column; gap: 24px; position: sticky; top: 80px; }
+
+    .sidebar-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .sidebar-card h3 {
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 16px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-card h3::before {
+      content: '';
+      width: 14px; height: 2px;
+      background: var(--green);
+    }
+
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-cloud-item {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .tag-cloud-item:hover { border-color: var(--green); color: var(--green); }
+
+    .about-card-text {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .about-card-link {
+      display: flex;
+      gap: 10px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .about-card-link:hover { color: var(--green); }
+
+    .rss-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--orange);
+      text-decoration: none;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,159,67,0.3);
+      transition: background 0.2s;
+    }
+    .rss-link:hover { background: rgba(255,159,67,0.05); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      max-width: 100%;
+    }
+    footer a { color: var(--green); text-decoration: none; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      nav { padding: 14px 24px; }
+      .hero { padding: 60px 24px 40px; }
+      .filter-bar { padding: 20px 24px; }
+      .main { grid-template-columns: 1fr; padding: 32px 24px; }
+      .sidebar { position: static; }
+      .search-box { margin-left: 0; width: 100%; }
+      .search-box input { width: 100%; }
+      footer { padding: 20px 24px; flex-direction: column; gap: 10px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">SS<span> // writeups</span></a>
+    <div class="nav-right">
+      <a href="index.html">← Portfolio</a>
+      <a href="https://github.com/shivanshsahajpal22-dev" target="_blank">GitHub</a>
+      <div class="nav-count" id="navCount">0 writeups</div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Shivansh Sahajpal</div>
+    <h1>Security <span>Writeups</span><br>&amp; Research</h1>
+    <p class="hero-sub">
+      Documenting vulnerabilities, CTF solutions, bug bounty findings, and tool builds.
+      Every writeup is a lesson learned — for me and for you.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num" id="totalCount">0</span>
+        <span class="stat-label">Writeups</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="bugBountyCount">0</span>
+        <span class="stat-label">Bug Bounty</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" id="ctfCount">0</span>
+        <span class="stat-label">CTF Solves</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="web">Web</button>
+    <button class="filter-btn" data-filter="cloud">Cloud</button>
+    <button class="filter-btn" data-filter="ctf">CTF</button>
+    <button class="filter-btn" data-filter="bugbounty">Bug Bounty</button>
+    <button class="filter-btn" data-filter="tool">Tools</button>
+    <button class="filter-btn" data-filter="network">Network</button>
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search writeups..."/>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div>
+      <div class="writeups-list" id="writeupsList">
+
+        <!-- ════════════════════════════════════════════════════
+             PASTE YOUR WRITEUP CARDS HERE WHEN YOU'RE READY.
+             Each card follows this pattern:
+
+        <article class="writeup-card" data-tags="web bugbounty">
+          <div class="wc-left">
+            <div class="wc-date">12 Jan 2025</div>
+            <div class="wc-num">01</div>
+          </div>
+          <div class="wc-body">
+            <div class="wc-tags">
+              <span class="wc-tag web">Web</span>
+              <span class="wc-tag bugbounty">Bug Bounty</span>
+            </div>
+            <h2 class="wc-title">Stored XSS in [Target] via Upload Endpoint</h2>
+            <p class="wc-excerpt">
+              Found a stored XSS vulnerability in a target's file upload feature
+              that allowed arbitrary script execution in victim sessions.
+            </p>
+            <div class="wc-meta">
+              <span class="wc-difficulty medium">Medium</span>
+              <span class="wc-platform">HackerOne · Program Name</span>
+              <span class="wc-read">5 min read</span>
+            </div>
+            <a href="writeups/01-xss-target.html" class="wc-link">Read Writeup →</a>
+          </div>
+        </article>
+
+             ════════════════════════════════════════════════════ -->
+
+      </div><!-- end writeups-list -->
+
+      <!-- EMPTY STATE — auto-hidden when writeups exist -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">No writeups yet — but watch this space.</div>
+        <p class="empty-sub">
+          Writeups from web pentests, CTFs, bug bounty findings, and tool builds will appear here.
+        </p>
+        <div class="empty-hint">
+          <div><span class="hl">// HOW TO ADD A WRITEUP</span></div>
+          <div>1. Copy the &lt;article class="writeup-card"&gt; template</div>
+          <div>2. Paste it inside #writeupsList above</div>
+          <div>3. Fill in title, date, tags, excerpt</div>
+          <div>4. Set href to your writeup HTML file</div>
+          <div>5. Update data-tags for filtering to work</div>
+        </div>
+      </div>
+
+      <!-- NO RESULTS STATE -->
+      <div class="empty-state" id="noResults" style="display:none;">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No results found.</div>
+        <p class="empty-sub">Try a different search term or filter.</p>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>About</h3>
+        <p class="about-card-text">
+          Shivansh Sahajpal — B.Tech Cybersecurity & CS student at Rashtriya Raksha University,
+          Gandhinagar. Into web/cloud pentesting, bug bounties, and writing tools.
+        </p>
+        <a href="index.html" class="about-card-link">← Back to Portfolio</a>
+        <a href="https://github.com/shivanshsahajpal22-dev" target="_blank" class="about-card-link">⌥ GitHub</a>
+        <a href="https://www.linkedin.com/in/shivansh-sahajpal-8760a6406/" target="_blank" class="about-card-link">in LinkedIn</a>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Topics</h3>
+        <div class="tag-cloud">
+          <span class="tag-cloud-item" onclick="filterByTag('web')">Web</span>
+          <span class="tag-cloud-item" onclick="filterByTag('cloud')">Cloud</span>
+          <span class="tag-cloud-item" onclick="filterByTag('ctf')">CTF</span>
+          <span class="tag-cloud-item" onclick="filterByTag('bugbounty')">Bug Bounty</span>
+          <span class="tag-cloud-item" onclick="filterByTag('tool')">Tools</span>
+          <span class="tag-cloud-item" onclick="filterByTag('network')">Network</span>
+          <span class="tag-cloud-item" onclick="filterByTag('all')">All</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>Subscribe</h3>
+        <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:12px; line-height:1.6;">
+          Get notified when new writeups drop.
+        </p>
+        <a href="mailto:shivansh.sahajpal.22@gmail.com?subject=Subscribe to writeups" class="rss-link">
+          ✉ Email me to subscribe
+        </a>
+      </div>
+    </aside>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2025 <a href="index.html">Shivansh Sahajpal</a> — All findings disclosed responsibly.</div>
+    <div style="color:var(--text-dim);">// hack responsibly.</div>
+  </footer>
+
+  <script>
+    // ── COUNT WRITEUPS & UPDATE STATS ──
+    function updateStats() {
+      const cards = document.querySelectorAll('.writeup-card');
+      const total = cards.length;
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('navCount').textContent = total + ' writeup' + (total !== 1 ? 's' : '');
+
+      let bb = 0, ctf = 0;
+      cards.forEach(c => {
+        const tags = c.dataset.tags || '';
+        if (tags.includes('bugbounty')) bb++;
+        if (tags.includes('ctf')) ctf++;
+      });
+      document.getElementById('bugBountyCount').textContent = bb;
+      document.getElementById('ctfCount').textContent = ctf;
+
+      // Show/hide empty state
+      document.getElementById('emptyState').style.display = total === 0 ? 'flex' : 'none';
+    }
+
+    // ── FILTER ──
+    let activeFilter = 'all';
+    let searchVal = '';
+
+    function applyFilters() {
+      const cards = document.querySelectorAll('.writeup-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const tags = card.dataset.tags || '';
+        const title = card.querySelector('.wc-title')?.textContent.toLowerCase() || '';
+        const excerpt = card.querySelector('.wc-excerpt')?.textContent.toLowerCase() || '';
+        const matchTag = activeFilter === 'all' || tags.includes(activeFilter);
+        const matchSearch = !searchVal || title.includes(searchVal) || excerpt.includes(searchVal) || tags.includes(searchVal);
+        const show = matchTag && matchSearch;
+        card.style.display = show ? 'flex' : 'none';
+        if (show) visible++;
+      });
+      document.getElementById('noResults').style.display =
+        (visible === 0 && cards.length > 0) ? 'flex' : 'none';
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      searchVal = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    function filterByTag(tag) {
+      activeFilter = tag;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === tag);
+      });
+      applyFilters();
+    }
+
+    // Init
+    updateStats();
+  </script>
+</body>
+</html>
